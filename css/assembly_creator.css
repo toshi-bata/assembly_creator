@@ -1,0 +1,59 @@
+#footer {
+    text-align: right;
+    font-size: 12px;
+    margin-right: 10px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.toolbarBtn {
+    border: solid 1px #000000;
+    background-color: floralWhite;
+}
+#cmdBtns {
+    padding-left: 2px;
+    padding-top: 2px;
+}
+.partList {
+    position: absolute;
+    min-width: 200px;
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+}
+.partList_thumbnail {
+    margin-left: 10px;
+    flex: 0 1 calc(50% - 10px);
+}
+.partList_thumbnail:nth-child(n + 3) {
+    margin-top: 10px;
+}
+.partList img {  
+    width: 100%;  
+    display: block;
+}
+#cmdDlg {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+}
+#instruction {
+    position: absolute;
+}
+#tree1 {
+    position: absolute;
+    width: 200px;
+    overflow: auto;
+}
+#loadJsonBtn {
+    position: absolute;
+    bottom: 20px;
+    left: 10px;
+}
+#loadingImage{
+    position: absolute;
+}
+#popupInput{
+    position: absolute;
+}
