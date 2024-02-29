@@ -13,40 +13,6 @@ Vue.component('commandDialog', {
             <input id="slideDistance" type="text" name="distance" size="5" value="10" v-on:blur="changeHandler">
             <button data-command="slideP"  v-on:click="mateAdjustHandler">Slide +</button>
         </div>
-        <div id="clippingDlg" style="display: none;">
-            <input class="toolbarBtn cmdToggleBtn" data-command="section_x" data-on="false" title="X" type="image" name="image_button" src="css/images/section_x.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="reverse_x" data-on="false" title="Reverse X" type="image" name="image_button" src="css/images/reverse.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="snap_x" data-on="false" title="Snap X" type="image" name="image_button" src="css/images/snap24.png" v-on:click="sectionHandler" />
-            <input class="cuttingOffset" id="cuttingOffset_x" type="text" name="Offset X" size="5" value="50" v-on:change="changeHandler"><br>
-            <div class="slider" id='slider_x' style="margin-top: 6px;margin-bottom: 8px;"></div>
-
-            <input class="toolbarBtn cmdToggleBtn" data-command="section_y" data-on="false" title="Y" type="image" name="image_button" src="css/images/section_y.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="reverse_y" data-on="false" title="Reverse Y" type="image" name="image_button" src="css/images/reverse.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="snap_y" data-on="false" title="Snap Y" type="image" name="image_button" src="css/images/snap24.png" v-on:click="sectionHandler" />
-            <input class="cuttingOffset" id="cuttingOffset_y" type="text" name="Offset Y" size="5" value="50" v-on:change="changeHandler"><br>
-            <div class="slider" id='slider_y' style="margin-top: 6px;margin-bottom: 8px;"></div>
-
-            <input class="toolbarBtn cmdToggleBtn" data-command="section_z" data-on="false" title="Z" type="image" name="image_button" src="css/images/section_z.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="reverse_z" data-on="false" title="Reverse Z" type="image" name="image_button" src="css/images/reverse.png" v-on:click="sectionHandler" />
-            <input class="toolbarBtn cmdToggleBtn" data-command="snap_z" data-on="false" title="Snap Z" type="image" name="image_button" src="css/images/snap24.png" v-on:click="sectionHandler" />
-            <input class="cuttingOffset" id="cuttingOffset_z" type="text" name="Offset Y" size="5" value="50" v-on:change="changeHandler"><br>
-            <div class="slider" id='slider_z' style="margin-top: 6px;margin-bottom: 8px;"></div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="sectioning" v-on:change="checkHandler">
-                <label class="form-check-label" for="sectioning">Sectioning</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="showSections" v-on:change="checkHandler">
-                <label class="form-check-label" for="showSections">Show Cutting Sections</label>
-            </div>
-
-            Color: <input class='simple_color' value='#999999'/>
-        </div>
-        <div id="popupInput" style="display: none;">
-            <input id="cuttingOffset" type="text" name="Offset" size="5" v-on:change="changeHandler"><br>
-        </div>
     </div>`,
     data: function() {
         return {
@@ -99,17 +65,6 @@ Vue.component('commandDialog', {
                 }
                 this.$emit('onDialogBtn', e, ui.value);
             },
-        });
-
-        // Create color picker
-        $('.simple_color').simpleColor({
-            cellWidth: 9,
-            cellHeight: 9,
-            onSelect: (hex, element) => {
-                const rgb = this.hex2rgb(hex);
-                const color = new Communicator.Color(rgb[0], rgb[1], rgb[2]);
-                this.$emit('onDialogBtn', {type: "color"}, color);
-            }
         });
     },
     methods: {

@@ -20,8 +20,6 @@ class CoplanarMateOperator {
         this._centerForFlip;
         this._axisForSlide;
         this._isBusy = false;
-        this._isParallelMode = false;
-        this._isPerpendicularMode = false;
     };
 
     onMouseMove(event) {
@@ -149,15 +147,6 @@ class CoplanarMateOperator {
                 }
 
                 this._axisForSlide = this._vector1.copy();
-                
-                // Change rotation angle if perpendicular mode
-                if (this._isPerpendicularMode) {
-                    rotation.angleDeg -= 90;
-
-                    const matrix = Communicator.Matrix.createFromOffAxisRotation(rotation.axis, 90);
-                    this._axisForSlide = matrix.transform(this._axisForSlide);
-                    this._axisForSlide.normalize();
-                }
 
                 this._animationCtrl.rotateAnimation(nodeIds, rotation.axis, this._prePoint, 500, rotation.angleDeg, 100).then(() => {
                     this._axisForFlip = rotation.axis;
@@ -183,15 +172,6 @@ class CoplanarMateOperator {
 
                     nodeIds = [this._mobileNode];
                     if (0 == dist) nodeIds = undefined;
-                    
-                    // For parallel / Perpendicular mode
-                    if (this._isParallelMode || this._isPerpendicularMode) {
-                        // Skip translation
-                        nodeIds = undefined;
-
-                        // Change flip point
-                        this._centerForFlip = this._prePoint;
-                    }
 
                     this._animationCtrl.translateAnimation(nodeIds, transVect, 500, dist, 100).then(() => {
                         this._viewer.model.unsetNodeFaceColor(this._nodeId1, this._faceId1);
@@ -280,21 +260,12 @@ class CoplanarMateOperator {
             document.getElementById(this._slideToolbatId).style.display ="none";
         }
 
-        this._isParallelMode = false;
-        this._isPerpendicularMode = false;
     }
 
-    init(isParallelMode) {
+    init() {
         if (undefined != this._instructionId) {
             document.getElementById(this._instructionId).innerHTML = "Select a planar face of target part.";
         }
     }
 
-    setParallelMode() {
-        this._isParallelMode = true;
-    }
-
-    setPerpendicularMode() {
-        this._isPerpendicularMode = true;
-    }
 }
