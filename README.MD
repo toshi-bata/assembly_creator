@@ -27,6 +27,6 @@ i.e.)<br>
     `cd …/cloud_modeler`<br>
     `npm install`<br>
     `npm start`<br>
-2. Launch your web server and <HOOPS Communicator SDK>\quick_start\start_server.bat
+2. Start <HOOPS Communicator SDK>\quick_start\start_server.bat
 3. Open (using Chrome)<br>
 &emsp;http://localhost:8000/assembly_creator.html?viewer=CSR&instance=housing
