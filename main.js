@@ -6,21 +6,15 @@ var app = new Vue({
         message: '',
     },
     created: function() {
-        const url = "part_list.js";
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'jsonp',
-            jsonp: 'callback',
-            jsonpCallback: 'parts'
-        })
-        .done(function(data, textStatus, jqXHR) {
-            this.partList = data;
-        }.bind(this))
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            this.isError = true;
-            this.message = 'Fail to load part list.';
-        }.bind(this));
-
+        const url = "parts/parts_list.json";
+        $.getJSON(url, (data) => {
+            if (data.parts) {
+                this.partList = data.parts;
+            }
+            else {
+                this.isError = true;
+                this.message = 'Fail to load part list.';
+            }
+        });
     }
 });

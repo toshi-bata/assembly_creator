@@ -130,7 +130,7 @@ class CoplanarMateOperator {
             }
             // 2nd selection
             else {
-                this._mobileNode = this._preNodeId;
+                this._mobileNode = this._owner.getPartNodeId(this._preNodeId);
                 this._isBusy = true;
                 const initialMatrix = this._viewer.model.getNodeMatrix(this._mobileNode);
 
@@ -186,22 +186,14 @@ class CoplanarMateOperator {
 
                         // Create history
                         if (undefined != this._owner) {
-                            const root = this._viewer.model.getAbsoluteRootNode();
                             let nodeId = this._mobileNode;
-                            let parentId = this._viewer.model.getNodeParent(nodeId);
-                            while (root != parentId) {
-                                nodeId = parentId;
-                                parentId = this._viewer.model.getNodeParent(nodeId);
-                            }
-
                             const newMatrix = this._viewer.model.getNodeMatrix(this._mobileNode);
 
                             const history = {
                                 type: "transform",
-                                nodes: [this._mobileNode],
-                                initialMatrices: [initialMatrix],
-                                newMatrices: [newMatrix],
-                                parentId: nodeId,
+                                nodeId: this._mobileNode,
+                                initialMatrix: initialMatrix,
+                                newMatrix: newMatrix,
                             }
                             this._owner.createHistory(history);
                         }

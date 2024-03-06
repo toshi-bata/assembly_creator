@@ -40,6 +40,7 @@ Vue.component('assembly-creator', {
             historys: new Array(),
             currentHistory: -1,
             scNameMap: {},
+            partNodes: new Array,
         }
     },
     created: function() {
@@ -74,8 +75,9 @@ Vue.component('assembly-creator', {
             modelName = "_empty";
         }
         const reverseProxy = getURLArgument("proxy");
-            
-        createViewer(viewerMode, modelName, "container", reverseProxy).then((hwv) => {
+
+        const scsFileName = "parts/" + modelName + ".scs"
+        createViewer(viewerMode, scsFileName, "container", reverseProxy).then((hwv) => {
             this.viewer = hwv;
 
             this.viewer.setCallbacks({
@@ -110,7 +112,7 @@ Vue.component('assembly-creator', {
                         const selectionType = selectionEvent.getType();
                         if (selectionType != Communicator.SelectionType.None) {
                             const selection = selectionEvent.getSelection();
-                            const selectedNode = selection.getNodeId();
+                            const selectedNode = this.getPartNodeId(selection.getNodeId());
                 
                             // Show handle
                             this.handleOpOp.addHandle(selectedNode);
@@ -120,19 +122,13 @@ Vue.component('assembly-creator', {
                 handleEventEnd: (event, nodeIds, initialMatrices, newMatrices) => {
                     if (-1 != this.viewer.operatorManager.indexOf(this.handleOpOpHandle)) {
                         const root = this.viewer.model.getAbsoluteRootNode();
-                        let nodeId = nodeIds[0];
-                        let parentId = this.viewer.model.getNodeParent(nodeId);
-                        while (root != parentId) {
-                            nodeId = parentId;
-                            parentId = this.viewer.model.getNodeParent(nodeId);
-                        }
+                        let partNode = this.getPartNodeId(nodeIds[0]);
 
                         const history = {
                             type: "transform",
-                            nodes: nodeIds,
-                            initialMatrices, initialMatrices,
-                            newMatrices: newMatrices,
-                            parentId: nodeId,
+                            nodeId: partNode,
+                            initialMatrix: initialMatrices[0],
+                            newMatrix: newMatrices[0],
                         }
                         this.createHistory(history);
                     }
@@ -165,7 +161,7 @@ Vue.component('assembly-creator', {
     },
     filters: {
         img_name: function(partName) {
-            return 'css/images/' + partName + '.png';
+            return 'parts/' + partName + '.png';
         }
     },
     methods: {
@@ -391,6 +387,19 @@ Vue.component('assembly-creator', {
                 }
             }
         },
+        getPartNodeId(childNode) {
+            const root = this.viewer.model.getAbsoluteRootNode();
+            let parentNode = childNode;
+            do {
+                for (let i = 0; i < this.partNodes.length; i++) {
+                    if (parentNode == this.partNodes[i]) {
+                        return this.partNodes[i];
+                    }
+                }
+                parentNode = this.viewer.model.getNodeParent(parentNode)                
+            } while (root != parentNode);
+            return childNode;
+        },
         createHistory(history) {
             this.currentHistory++;
 
@@ -409,7 +418,7 @@ Vue.component('assembly-creator', {
         updateLastHistoryMatrices(newMatrices) {
             let history = this.historys[this.currentHistory];
             if ("transform" == history.type) {
-                history.newMatrices = newMatrices;
+                history.newMatrix = newMatrices[0];
                 this.createJson();
             }
         },
@@ -418,11 +427,7 @@ Vue.component('assembly-creator', {
                 let targetHistory = this.historys[this.currentHistory];
 
                 if ('transform' == targetHistory.type) {
-                    let promiseArr = new Array(0);
-                    for (let i = 0; i < targetHistory.nodes.length; i++) {
-                        promiseArr.push(this.viewer.model.setNodeMatrix(targetHistory.nodes[i], targetHistory.initialMatrices[i]));
-                    }
-                    Promise.all(promiseArr);
+                    this.viewer.model.setNodeMatrix(targetHistory.nodeId, targetHistory.initialMatrix);
                 }
                 else if ('addPart' == targetHistory.type) {
                     let nodeId = targetHistory.nodeId;
@@ -448,31 +453,26 @@ Vue.component('assembly-creator', {
                 let targetHistory = this.historys[this.currentHistory];
 
                 if ('transform' == targetHistory.type) {
-                    let promiseArr = new Array(0);
-                    for (let i = 0; i < targetHistory.nodes.length; i++) {
-                        promiseArr.push(this.viewer.model.setNodeMatrix(targetHistory.nodes[i], targetHistory.newMatrices[i]));
-                    }
-                    Promise.all(promiseArr);
+                    this.viewer.model.setNodeMatrix(targetHistory.nodeId, targetHistory.newMatrix);
                 }
                 else if ('addPart' == targetHistory.type) {
                     const partName = targetHistory.partName;
+                    const scsFileName = "parts/" + partName + ".scs";
                     const matrix = targetHistory.matrix;
 
                     // Load the part
                     const root = this.viewer.model.getAbsoluteRootNode();
                     let config = new Communicator.LoadSubtreeConfig();
-                    this.viewer.model.loadSubtreeFromModel(root, partName, config).then((nodeIds) => {
+                    this.viewer.model.loadSubtreeFromScsFile(root, scsFileName, config).then((nodeIds) => {
                         const oldId = targetHistory.nodeId;
                         targetHistory.nodeId = nodeIds[0];
+                        this.partNodes.push(nodeIds[0]);
                         
                         for (let i = this.currentHistory + 1; i < this.historys.length; i++) {
                             let history = this.historys[i];
                             if ('transform' == history.type) {
-                                if (history.parentId == oldId) {
-                                    history.parentId = targetHistory.nodeId;
-                                    let nodes = new Array(0);
-                                    this.getLeafNodes(history.parentId, nodes);
-                                    history.nodes = nodes;
+                                if (history.nodeId == oldId) {
+                                    history.nodeId = targetHistory.nodeId;
                                 }
                             }
                         }
@@ -496,6 +496,8 @@ Vue.component('assembly-creator', {
         addPart(nodeId, partName, matrix) {
             this.resetCommands();
 
+            this.partNodes.push(nodeId);
+
             const nodeName = this.viewer.model.getNodeName(nodeId);
             this.scNameMap[nodeName] = partName;
 
@@ -509,16 +511,16 @@ Vue.component('assembly-creator', {
 
             this.addTreeNode(partName, nodeId, true);
         },
-        getLeafNodes(node, nodes) {
-            let children = this.viewer.model.getNodeChildren(node);
-            if (0 == children.length) {
-                nodes.push(node);
-                return;
-            }
-            for (let chile of children) {
-                this.getLeafNodes(chile, nodes);
-            }
-        },
+        // getLeafNodes(node, nodes) {
+        //     let children = this.viewer.model.getNodeChildren(node);
+        //     if (0 == children.length) {
+        //         nodes.push(node);
+        //         return;
+        //     }
+        //     for (let chile of children) {
+        //         this.getLeafNodes(chile, nodes);
+        //     }
+        // },
         setTreeEvent() {
             $('#tree').on({
                 'hover_node.jstree': (event, obj) => {
@@ -560,41 +562,26 @@ Vue.component('assembly-creator', {
             this.$refs.tree1.deleteNode(String(id));
             this.setTreeEvent();
         },
-        getNodeMatrices(node, matrices) {
-            // console.log(this.viewer.model.getNodeName(node));
-            let matrix = this.viewer.model.getNodeMatrix(node);
-            matrices.push(matrix.toJson());
-
-            let children = this.viewer.model.getNodeChildren(node);
-            if (0 == children.length) {
-                return;
-            }
-            for (let chile of children) {
-                this.getNodeMatrices(chile, matrices);
-            }
-        },
         createJson() {
             const root = this.viewer.model.getAbsoluteRootNode();
             let children = this.viewer.model.getNodeChildren(root);
 
-            let modelNames = new Array(0);
-            let nodeVisibilities = new Array(0);
+            let partInfoArr = new Array(0);
 
             for (let node of children) {
-                let nodeName = this.viewer.model.getNodeName(node);
+                const nodeName = this.viewer.model.getNodeName(node);
                 if ("sectionHandle" != nodeName) {
-                    modelNames.push(this.scNameMap[nodeName]);
-                    nodeVisibilities.push(this.viewer.model.getNodeVisibility(node));
+                    let matrix = this.viewer.model.getNodeMatrix(node);
+                    partInfoArr.push({
+                        name: this.scNameMap[nodeName],
+                        visibility: this.viewer.model.getNodeVisibility(node),
+                        matrix: matrix.toJson()
+                    });
                 }
             }
 
-            let matrices = new Array(0);
-            this.getNodeMatrices(root, matrices);
-
             let assembly = {
-                modelNames: modelNames,
-                nodeVisibilities: nodeVisibilities,
-                matrices: matrices
+                parts: partInfoArr
             }
 
             let jsonStr = JSON.stringify(assembly);
@@ -640,49 +627,30 @@ Vue.component('assembly-creator', {
                 await this.viewer.model.deleteNode(nodeId);
             }
 
-            // Load models
-            const modelNames = assembly.modelNames;
-            let nodeIdsArr = [];
-            for (let name of modelNames) {
-                const nodeIds = await this.viewer.model.loadSubtreeFromModel(root, name);
-                nodeIdsArr.push(nodeIds);
-            }
-
-            const nodeVisibilities = assembly.nodeVisibilities;
-            let visibleNodes = new Array(0);
-
-            // Create model tree
             this.createTree("Model", root);
-            for (let i = 0; i < modelNames.length; i++) {
-                let modelName = modelNames[i];
-                let nodeIds = nodeIdsArr[i];
-                const visible = nodeVisibilities[i];
 
-                this.addTreeNode(modelName, nodeIds[0], visible);
+            // Load models
+            const parts = assembly.parts;
+            for (let part of parts) {
+                // Lode model
+                const scsFileName = "parts/" + part.name + ".scs";
+                let config = new Communicator.LoadSubtreeConfig();
+                if (false == part.visibility) config.attachInvisibly = true;
+                const nodeIds = await this.viewer.model.loadSubtreeFromScsFile(root, scsFileName, config);
 
-                if (false == visible) visibleNodes.push(nodeIds[0]);
+                // Set node matrix
+                const matrix = Communicator.Matrix.fromJson(part.matrix);
+                await this.viewer.model.setNodeMatrix(nodeIds[0], matrix);
 
                 // Create name map 
                 const nodeName = this.viewer.model.getNodeName(nodeIds[0]);
-                this.scNameMap[nodeName] = modelName;
-            }
+                this.scNameMap[nodeName] = part.name;
 
-            // Set matrix
-            const matArr = assembly.matrices;
-            let matrices = new Array(0);
-            for (let mat of matArr) {
-                matrices.push(Communicator.Matrix.fromJson(mat));
-            }
+                // Create model tree
+                this.addTreeNode(part.name, nodeIds[0], part.visibility);
 
-            let promiseArr = new Array(0);
-            this.setNodeMatrices(root, matrices, promiseArr);
-            Promise.all(promiseArr).then(() => {
-                // Set visibility
-                if (visibleNodes.length) {
-                    this.viewer.model.setNodesVisibility(visibleNodes,false);
-                }
                 $("#loadingImage").hide();
-            });
+            }
 
             // Reset history
             this.historys = new Array(),

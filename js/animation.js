@@ -35,8 +35,8 @@ class animation {
             if (undefined == nodeIds) return resolve();
 
             var count = 0;
-            var stepDistance = distance / time * interval;
-            var stepCount = time / interval;
+            var stepCount = Math.ceil(time / interval);
+            var stepDistance = distance / stepCount;
             //By giving pointer of the assemblyGuideLine instance, you will be able to draw assembly guide lines while animation
             var assyGuideLine = assyGuideLine;
             
@@ -45,6 +45,10 @@ class animation {
             }
 
             var nodeTranslationMatrixes = [];
+            var initMatrixes = [];
+            var finalTranslationMatrixes = [];
+            var matrixArr = [];
+
             for (var i = 0; i < nodeIds.length; i++) {
                 var nodeLocalVector = this._convertToLocalVector(nodeIds[i], vector);
                 nodeTranslationMatrixes.push(new Communicator.Matrix());
@@ -52,31 +56,39 @@ class animation {
                     nodeLocalVector.x * stepDistance, 
                     nodeLocalVector.y * stepDistance, 
                     nodeLocalVector.z * stepDistance);
+
+                initMatrixes.push(this._viewer.model.getNodeMatrix(nodeIds[i]));
+                finalTranslationMatrixes.push(new Communicator.Matrix());
+                finalTranslationMatrixes[i].setTranslationComponent(
+                    nodeLocalVector.x * distance, 
+                    nodeLocalVector.y * distance, 
+                    nodeLocalVector.z * distance);
             }
 
             var id = setInterval(() => {
-                for (var i = 0; i < nodeIds.length; i++) {
-                    var nodeMatrix = this._viewer.model.getNodeMatrix(nodeIds[i]);
-                    this._viewer.model.setNodeMatrix(nodeIds[i], Communicator.Matrix.multiply(nodeMatrix, nodeTranslationMatrixes[i]));
-                }
                 count++;
+                for (var i = 0; i < nodeIds.length; i++) {
+                    if (count < stepCount) {
+                        var nodeMatrix = this._viewer.model.getNodeMatrix(nodeIds[i]);
+                        this._viewer.model.setNodeMatrix(nodeIds[i], Communicator.Matrix.multiply(nodeMatrix, nodeTranslationMatrixes[i]));
+                    }
+                    else {
+                        var matrix = Communicator.Matrix.multiply(initMatrixes[i], finalTranslationMatrixes[i]);
+                        this._viewer.model.setNodeMatrix(nodeIds[i], matrix);
+                        matrixArr.push(matrix);
+                    }
+                }
                 // Increment markup line while animation
                 if (undefined != assyGuideLine) {
                     assyGuideLine.animationIncrement(count);
                 }
 
-                if (count >= stepCount) {
+                if (count == stepCount) {
                     clearInterval(id);
 
                     //  When animation is finished, remove dynamic markup lines and draw static polyline 
                     if (undefined != assyGuideLine) {
                         assyGuideLine.animationEnd();
-                    }
-
-                    let matrixArr = new Array(0);
-                    for (let nodeId of nodeIds) {
-                        const newMatrix = this._viewer.model.getNodeMatrix(nodeId);
-                        matrixArr.push(newMatrix);
                     }
 
                     resolve(matrixArr);
@@ -85,51 +97,60 @@ class animation {
         });
     }
 
-    rotateAnimation(nodeIds, rotationAxis, basePoint, time, angle, interval, localRotation) {
+    rotateAnimation(nodeIds, rotationAxis, basePoint, time, angle, interval) {
         return new Promise((resolve, reject) => {
             if (undefined == nodeIds) return resolve();
 
             var count = 0;
-            var stepAngle = angle / time * interval;
-            var stepCount = time / interval;
+            var stepCount = Math.ceil(time / interval);
+            var stepAngle = angle / stepCount;
             var translationMatrix = new Communicator.Matrix();
             var nodeRotationMatrixes = [];
             var localPoints = [];
+            var initMatrixes = [];
+            var finalRotationMatrixes = [];
+            let matrixArr = new Array(0);
 
             for (var i = 0; i < nodeIds.length; i++) {
-                if (undefined == localRotation) {
-                    var nodeLocalAxis = this._convertToLocalVector(nodeIds[i], rotationAxis);
-                    nodeRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, stepAngle));
-                }
-                else{
-                    nodeRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(rotationAxis, stepAngle));
-                }
+                var nodeLocalAxis = this._convertToLocalVector(nodeIds[i], rotationAxis);
+                nodeRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, stepAngle));
+                initMatrixes.push(this._viewer.model.getNodeMatrix(nodeIds[i]));
+                finalRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, angle));
                 localPoints.push(this._convertToLocalPoint(nodeIds[i], basePoint))
             }
 
             var id = setInterval(() => {
                 count++;
                 for (var i = 0; i < nodeIds.length; i++) {
+                    var roMatrix;
+                    var nodeMatrix;
+                    if (count < stepCount) {
+                        roMatrix = nodeRotationMatrixes[i];
+                        nodeMatrix = this._viewer.model.getNodeMatrix(nodeIds[i]);
+                    }
+                    else {
+                        roMatrix = finalRotationMatrixes[i];
+                        nodeMatrix = initMatrixes[i];
+                    }
+
                     var point = Communicator.Point3.zero();
-                    nodeRotationMatrixes[i].transform(localPoints[i], point);
+                    roMatrix.transform(localPoints[i], point);
                     translationMatrix.setTranslationComponent(
                         localPoints[i].x - point.x,
                         localPoints[i].y - point.y,
                         localPoints[i].z - point.z);
 
-                    var nodeMatrix = this._viewer.model.getNodeMatrix(nodeIds[i]);
-                    var multiplyMatrix = Communicator.Matrix.multiply(nodeMatrix, nodeRotationMatrixes[i]);
-                    this._viewer.model.setNodeMatrix(nodeIds[i], Communicator.Matrix.multiply(multiplyMatrix, translationMatrix));
+                    var multiplyMatrix = Communicator.Matrix.multiply(nodeMatrix, roMatrix);
+                    multiplyMatrix = Communicator.Matrix.multiply(multiplyMatrix, translationMatrix);
+                    this._viewer.model.setNodeMatrix(nodeIds[i], multiplyMatrix);
+
+                    if (count == stepCount) {
+                        matrixArr.push(multiplyMatrix);
+                    }
                 }
 
-                if (count >= stepCount) {
+                if (count == stepCount) {
                     clearInterval(id);
-                    
-                    let matrixArr = new Array(0);
-                    for (let nodeId of nodeIds) {
-                        const newMatrix = this._viewer.model.getNodeMatrix(nodeId);
-                        matrixArr.push(newMatrix);
-                    }
                     resolve(matrixArr);
                 }
             }, interval);

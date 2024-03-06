@@ -14,8 +14,10 @@ class PartDragDropOperator {
 
         this._partName = partName;
 
+        const scsFileName = "parts/" + this._partName + ".scs";
+
         this._viewer.model.getModelBounding(true).then((bbox) => {
-            // Set ancher as current bounding box
+            // Set anchor as current bounding box
             let boxSize = Communicator.Point3.subtract(bbox.max, bbox.min);
             boxSize.scale(0.5);
             this._anchor = Communicator.Point3.add(boxSize, bbox.min);
@@ -24,7 +26,7 @@ class PartDragDropOperator {
             const root = this._viewer.model.getAbsoluteRootNode();
             let config = new Communicator.LoadSubtreeConfig();
             config.attachInvisibly = true;
-            this._viewer.model.loadSubtreeFromModel(root, partName, config).then((nodeIds) => {
+            this._viewer.model.loadSubtreeFromScsFile(root, scsFileName, config).then((nodeIds) => {
                 this._partNodeId = nodeIds[0];
             });
         });
@@ -83,10 +85,10 @@ class PartDragDropOperator {
         const camera = this._viewer.view.getCamera();
         const normal = Communicator.Point3.subtract(camera.getPosition(), this._anchor).normalize();
         const anchorPlane = Communicator.Plane.createFromPointAndNormal(this._anchor, normal);
-        const raycast = this._viewer.view.raycastFromPoint(screenPoint);
+        const ray = this._viewer.view.raycastFromPoint(screenPoint);
         const intersectionPoint = Communicator.Point3.zero();
 
-        if (anchorPlane.intersectsRay(raycast, intersectionPoint)) {
+        if (anchorPlane.intersectsRay(ray, intersectionPoint)) {
             return intersectionPoint;
         }
         else {
