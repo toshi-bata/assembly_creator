@@ -6,9 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <title>Assembly Creator</title>
-        <style>
-            [v-cloak] { opacity: 0; }
-        </style>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
         <script type="text/javascript" src="../src/js/jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -17,6 +14,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="../src/js/hoops_web_viewer.js"></script>
         <script type="text/javascript" src="../src/js/web_viewer_ui.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript" src="js/create_viewer.js"></script>
         <script type="text/javascript" src="js/general_func.js"></script>
         <script type="text/javascript" src="js/handle_operator_operator.js"></script>
@@ -25,27 +23,70 @@
         <script type="text/javascript" src="js/collinear_mate_operator.js"></script>
         <script type="text/javascript" src="js/concentric_mate_operator.js"></script>
         <script type="text/javascript" src="js/coplanar_mate_operator.js"></script>
-        <script type="text/javascript" src="js/animation.js"></script>
+        <script type="text/javascript" src="js/node_translation.js"></script>
 
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
         <link rel="stylesheet" href="css/assembly_creator.css">
         
         <!-- jsTree -->
-        <script type="text/javascript" src="js/jstree_func.js"></script>
+        <script type="text/javascript" src="js/model_tree.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 
+        <script type="text/javascript">
+            var main;
+            window.onload = function () {
+                main = new Main();
+
+                const viewerMode = getURLArgument("viewer");
+                let modelName = getURLArgument("instance");
+                if (modelName == undefined)
+                    modelName = "_empty";
+
+                main.start(viewerMode, modelName);
+            };
+        </script>
+
     </head>
     <body>
-        <div id="app" v-cloak>
-            <assembly-creator v-bind:parts="partList" v-bind:isError="isError" v-bind:message="message"></assembly-creator>
+        <div id="content">
+            <toolbar id="cmdBtns">
+                <input class="toolbarBtn" data-command="home" title="Home" type="image" name="image_button" src="css/images/home.png" />
+                <input class="toolbarBtn" data-command="undo" title="Undo" type="image" name="image_button" src="css/images/undo.png" />
+                <input class="toolbarBtn" data-command="redo" title="Redo" type="image" name="image_button" src="css/images/redo.png" style="margin-right: 10px;" />
+                <input class="toolbarBtn toggleBtn" data-command="collinear" data-on="false" title="Collinear" type="image" name="image_button" src="css/images/collinear.png" />
+                <input class="toolbarBtn toggleBtn" data-command="concentric" data-on="false" title="Concentric" type="image" name="image_button" src="css/images/concentric.png" />
+                <input class="toolbarBtn toggleBtn" data-command="coplanar" data-on="false" title="Coplanar" type="image" name="image_button" src="css/images/coplanar.png" style="margin-right: 10px;" />
+                <input class="toolbarBtn toggleBtn" data-command="measureDistance" data-on=false title="Measure distance" type="image" name="image_button" src="css/images/measure.png" />
+            </toolbar>
+            <div id="container" class="ui-widget-content"></div>
+            <textarea id="assemblyJson" style="width:800px; height:100px"></textarea>
+            <div id="jsonBtns">
+                <button id="copyJsonBtn" >Copy Json</button>
+                <button id="loadJsonBtn" >Load Json</button>
+            </div>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-        <script src="components/toolbar.js"></script>
-        <script src="components/commandDialog.js"></script>
-        <script src="components/modelTree.js"></script>
-        <script src="components/assembly_creator.js"></script>
-        <script src="main.js"></script>
+        <commandDialog id="cmdDlg" >
+            <button class="dialogBtn" id="flipBtn" data-command="flip" style="display:none;" >Flip mate</button>
+            <p></p>
+            <div id="rotateToolbar" style="display: none;">
+                <button class="dialogBtn" data-command="rotateM"  >Rotate -</button>
+                <input id="rotateAng" type="text" name="angle" size="5" value="90" >
+                <button class="dialogBtn" data-command="rotateP"  >Rotate +</button>
+            </div>
+            <div id="slideToolbar" style="display: none;">
+                <button class="dialogBtn" data-command="slideM" >Slide -</button>
+                <input id="slideDistance" type="text" name="distance" size="5" value="10" >
+                <button class="dialogBtn" data-command="slideP" >Slide +</button>
+            </div>
+        </commandDialog>
+        <modelTree id="tree1" ref="tree1">
+            <div id="tree"></div>
+        </modelTree>
+        <div id="instruction"></div>
+        <div id="footer">© Tech Soft 3D All Rights Reserved</div>
+        <img id="loadingImage" style="display: none;" src="css/images/spinner.gif" class="centerBlock" />
+        <div class="partsList" draggable="true">
+        </div>
     </body>
 </html>

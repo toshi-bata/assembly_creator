@@ -4,7 +4,7 @@ class CollinearMateOperator {
         this._instructionId = instructionId;
         this._flipBtnId = flipBtnId;
         this._owner = owner;
-        this._animationCtrl = new animation(viewer);
+        this._nodeTranslationCtrl = new nodeTranslation(viewer);
         this._preNodeId;
         this._preLineId
         this._prePoint;
@@ -29,7 +29,7 @@ class CollinearMateOperator {
     };
 
     onMouseMove(event) {
-        // Stop pre-selection while animation
+        // Stop pre-selection while nodeTranslation
         if (this._isBusy) {
             return;
         }
@@ -150,7 +150,7 @@ class CollinearMateOperator {
                 let nodeIds = [this._mobileNode];
                 if (undefined == rotation.axis) nodeIds = undefined;
 
-                this._animationCtrl.rotateAnimation(nodeIds, rotation.axis, this._prePoint, 500, rotation.angleDeg, 100).then(() => {
+                this._nodeTranslationCtrl.rotate(nodeIds, rotation.axis, this._prePoint, 500, rotation.angleDeg, 100).then(() => {
                     this._axisForFlip = rotation.axis;
                     this._centerForFlip = this._point1.copy();
                     if (undefined != this._flipBtnId) {
@@ -164,7 +164,7 @@ class CollinearMateOperator {
                     nodeIds = [this._mobileNode];
                     if (0 == dist) nodeIds = undefined;
                     
-                    this._animationCtrl.translateAnimation(nodeIds, transVect, 500, dist, 100).then(() => {
+                    this._nodeTranslationCtrl.translate(nodeIds, transVect, 500, dist, 100).then(() => {
                         this._viewer.markupManager.unregisterMarkup(this._markupHandle1);
                         this._markupHandle1 = undefined;
 
@@ -207,7 +207,7 @@ class CollinearMateOperator {
             return;
         }
 
-        this._animationCtrl.rotateAnimation([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.rotate([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }

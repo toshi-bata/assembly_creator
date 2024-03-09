@@ -6,7 +6,7 @@ class ConcentricMateOperator {
         this._rorateToolbatId = rotateToolbarId;
         this._slideToolbatId = slideToolbarId;
         this._owner = owner;
-        this._animationCtrl = new animation(viewer);
+        this._nodeTranslationCtrl = new nodeTranslation(viewer);
         this._nodeId1;
         this._lineId1;
         this._centerPnt1;
@@ -30,7 +30,7 @@ class ConcentricMateOperator {
     };
 
     onMouseMove(event) {
-        // Stop pre-selection while animation
+        // Stop pre-selection while nodeTranslation
         if (this._isBusy) {
             return;
         }
@@ -247,7 +247,7 @@ class ConcentricMateOperator {
                     rotation = vectorsAngleDeg(this._preCenterAxis, this._centerAxis1);
                 }
 
-                this._animationCtrl.rotateAnimation(nodeIds, rotation.axis, this._preCenter, 500, rotation.angleDeg, 100).then(() => {
+                this._nodeTranslationCtrl.rotate(nodeIds, rotation.axis, this._preCenter, 500, rotation.angleDeg, 100).then(() => {
                     if (undefined != this._flipBtnId) {
                         document.getElementById(this._flipBtnId).style.display ="block";
                     }
@@ -259,7 +259,7 @@ class ConcentricMateOperator {
                     nodeIds = [this._mobileNode];
                     if (0 == dist) nodeIds = undefined;
 
-                    this._animationCtrl.translateAnimation(nodeIds, transVect, 500, dist, 100).then(() => {
+                    this._nodeTranslationCtrl.translate(nodeIds, transVect, 500, dist, 100).then(() => {
                         if (undefined != this._rorateToolbatId) {
                             document.getElementById(this._rorateToolbatId).style.display ="block";
                         }
@@ -321,7 +321,7 @@ class ConcentricMateOperator {
             return;
         }
 
-        this._animationCtrl.rotateAnimation([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.rotate([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }
@@ -331,7 +331,7 @@ class ConcentricMateOperator {
             return;
         }
 
-        this._animationCtrl.translateAnimation([this._mobileNode], this._axisForSlide, 500, dist, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.translate([this._mobileNode], this._axisForSlide, 500, dist, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }
@@ -341,7 +341,7 @@ class ConcentricMateOperator {
             return;
         }
 
-        this._animationCtrl.rotateAnimation([this._mobileNode], this._axisForSlide, this._centerForFlip, 500, angleDeg, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.rotate([this._mobileNode], this._axisForSlide, this._centerForFlip, 500, angleDeg, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }

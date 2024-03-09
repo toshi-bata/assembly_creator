@@ -14,7 +14,6 @@
         {"id": 12, "name": "piston"},
         {"id": 13, "name": "push_rod"},
         {"id": 14, "name": "screw_back"},
-        {"id": 15, "name": "screw_top"},
-        {"id": 16, "name": "_MOTO_X"}
+        {"id": 15, "name": "screw_top"}
     ]
 }

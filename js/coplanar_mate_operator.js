@@ -5,7 +5,7 @@ class CoplanarMateOperator {
         this._flipBtnId = flipBtnId;
         this._slideToolbatId = slideToolbarId;
         this._owner = owner;
-        this._animationCtrl = new animation(viewer);
+        this._nodeTranslationCtrl = new nodeTranslation(viewer);
         this._preNodeId;
         this._preFaceId
         this._prePoint;
@@ -23,7 +23,7 @@ class CoplanarMateOperator {
     };
 
     onMouseMove(event) {
-        // Stop pre-selection while animation
+        // Stop pre-selection while nodeTranslation
         if (this._isBusy) {
             return;
         }
@@ -148,7 +148,7 @@ class CoplanarMateOperator {
 
                 this._axisForSlide = this._vector1.copy();
 
-                this._animationCtrl.rotateAnimation(nodeIds, rotation.axis, this._prePoint, 500, rotation.angleDeg, 100).then(() => {
+                this._nodeTranslationCtrl.rotate(nodeIds, rotation.axis, this._prePoint, 500, rotation.angleDeg, 100).then(() => {
                     this._axisForFlip = rotation.axis;
                     
                     if (undefined != this._flipBtnId) {
@@ -173,7 +173,7 @@ class CoplanarMateOperator {
                     nodeIds = [this._mobileNode];
                     if (0 == dist) nodeIds = undefined;
 
-                    this._animationCtrl.translateAnimation(nodeIds, transVect, 500, dist, 100).then(() => {
+                    this._nodeTranslationCtrl.translate(nodeIds, transVect, 500, dist, 100).then(() => {
                         this._viewer.model.unsetNodeFaceColor(this._nodeId1, this._faceId1);
                         this._nodeId1 = undefined;
                         this._faceId1 = undefined;
@@ -209,7 +209,7 @@ class CoplanarMateOperator {
             return;
         }
 
-        this._animationCtrl.rotateAnimation([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.rotate([this._mobileNode], this._axisForFlip, this._centerForFlip, 500, 180, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }
@@ -219,7 +219,7 @@ class CoplanarMateOperator {
             return;
         }
 
-        this._animationCtrl.translateAnimation([this._mobileNode], this._axisForSlide, 500, dist, 100).then((newMatrices) => {
+        this._nodeTranslationCtrl.translate([this._mobileNode], this._axisForSlide, 500, dist, 100).then((newMatrices) => {
             this._owner.updateLastHistoryMatrices(newMatrices);
         });
     }

@@ -14,7 +14,7 @@
     padding-left: 2px;
     padding-top: 2px;
 }
-.partList {
+.partsList {
     position: absolute;
     min-width: 200px;
     flex: 1;
@@ -22,14 +22,14 @@
     flex-wrap: wrap;
     overflow: auto;
 }
-.partList_thumbnail {
+.partsList_thumbnail {
     margin-left: 10px;
     flex: 0 1 calc(50% - 10px);
 }
-.partList_thumbnail:nth-child(n + 3) {
+.partsList_thumbnail:nth-child(n + 3) {
     margin-top: 10px;
 }
-.partList img {  
+.partsList img {  
     width: 100%;  
     display: block;
 }
@@ -45,11 +45,6 @@
     position: absolute;
     width: 200px;
     overflow: auto;
-}
-#loadJsonBtn {
-    position: absolute;
-    bottom: 20px;
-    left: 10px;
 }
 #loadingImage{
     position: absolute;
