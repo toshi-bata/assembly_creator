@@ -312,6 +312,10 @@ class Main {
 
         $('#instruction').html("Drag a thumbnail from the part list and drop on the viewer");
 
+        $("#container").resize(() => {
+            this.layoutPage();
+        });
+
         this.layoutPage();
     }
 

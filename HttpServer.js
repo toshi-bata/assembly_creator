@@ -1,13 +1,4 @@
-//##################################################################################################
-//
-//  CEETRON Envision for Web
-//
-//  --------------------------------------------------------------------------------------------
-//  Copyright (C) 2016, Ceetron AS
-//##################################################################################################
-
 var PORT = process.env.PORT || 8000;
-const USE_HTTPS = process.env.CEW_USE_HTTPS || false;
 
 var connect = require('connect');
 var serveStatic = require('serve-static');
@@ -35,23 +26,10 @@ for (var i = 0; i < dirsToServe.length; i++) {
     connectApp.use(serveStatic(dirsToServe[i], {"setHeaders": setHeaders}));
 }
 
-if (USE_HTTPS) {
-    // 
-    // HTTPS server
-    console.log("Creating HTTPS server on port " + PORT);
+// HTTP server
+console.log("Creating HTTP server on port " + PORT);
 
-    let privateKey = fs.readFileSync(__dirname + '/MyDomain_private.key', 'utf8');
-    let certificate = fs.readFileSync(__dirname + '/MyDomain.crt', 'utf8');
-    let credentials = { key: privateKey, cert: certificate };
-    webServer = https.createServer(credentials, connectApp);
-}
-else {
-    //
-    // HTTP server
-    console.log("Creating HTTP server on port " + PORT);
-
-    webServer = http.createServer(connectApp);
-}
+webServer = http.createServer(connectApp);
 
 webServer.listen(PORT, function() {
     console.log('HttpServer listening on port ' + PORT + '...');
