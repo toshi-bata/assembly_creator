@@ -1,7 +1,6 @@
-# Assmbly creator
-This demo introduces an unique workflow using HOOPS Communicator  that loads parts from a parts list and constructs an assembly model using mate commands such as collinear, concentric and coplanar.<br>
-Created assembly structure can be represented in JSON string and reproduced.<br>
-This demo adopts vue.js framework.
+# HOOPS Communicator Assmbly Creator
+This demo introduces an unique workflow using HOOPS Communicator that loads parts from a parts list and constructs an assembly model using custom mate operators such as collinear, concentric and coplanar. This workflow can be utilized in various industries such as maintenance manual, work instruction or e-commerce (custom order), etc.<br>  
+The created assembly structure can be represented in a  JSON string and reproduced.
 
 ## Dependencies
 ### SDKs in use (version)
