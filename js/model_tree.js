@@ -1,4 +1,5 @@
-class ModelTree {
+import * as Communicator from "../hoops-web-viewer.mjs";
+export class ModelTree {
     constructor(viewer, treeDiv, owner) {
         this._viewer = viewer;
         this._treeDiv = treeDiv;

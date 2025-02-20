@@ -1,4 +1,7 @@
-class CollinearMateOperator {
+import * as Communicator from "../hoops-web-viewer.mjs";
+import { ArrowMarkup, vectorsAngleDeg } from "./common_utilities.js";
+import { nodeTranslation } from "./node_translation.js";
+export class CollinearMateOperator {
     constructor(viewer, instructionId, flipBtnId, owner) {
         this._viewer = viewer;
         this._instructionId = instructionId;
@@ -50,7 +53,7 @@ class CollinearMateOperator {
 
                 if (this._preMarkupHandles.length) {
                     for (let guid of this._preMarkupHandles) {
-                        this._viewer.markupManager.unregisterMarkup(guid);
+                        this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                     }
                     this._preMarkupHandles.length = 0;
                 }
@@ -71,7 +74,7 @@ class CollinearMateOperator {
             // Remove previous markup line
             if (this._preMarkupHandles.length) {
                 for (let guid of this._preMarkupHandles) {
-                    this._viewer.markupManager.unregisterMarkup(guid);
+                    this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                 }
                 this._preMarkupHandles.length = 0;
             }
@@ -106,7 +109,7 @@ class CollinearMateOperator {
 
             // Draw pre-select marker line
             this._preMarkupItem.setPosiiton(this._prePoint, enPnt);
-            const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem);
+            const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem, this._viewer.view);
             this._preMarkupHandles.push(guid);
         });
     }
@@ -127,7 +130,7 @@ class CollinearMateOperator {
                 // Switch markup line
                 const pnts = this._preMarkupItem.getPosition();
                 this._markupItem1.setPosiiton(pnts[0], pnts[1]);
-                this._markupHandle1 = this._viewer.markupManager.registerMarkup(this._markupItem1);
+                this._markupHandle1 = this._viewer.markupManager.registerMarkup(this._markupItem1, this._viewer.view);
 
                 if (undefined != this._instructionId) {
                     document.getElementById(this._instructionId).innerHTML = "Select a straight edge of mobile part.";
@@ -157,7 +160,7 @@ class CollinearMateOperator {
                         document.getElementById(this._flipBtnId).style.display ="block";
                     }
 
-                    let transVect = new Communicator.Point3.subtract(this._point1, this._prePoint);
+                    let transVect = Communicator.Point3.subtract(this._point1, this._prePoint);
                     let dist = transVect.length();
                     transVect.normalize();
 
@@ -165,7 +168,7 @@ class CollinearMateOperator {
                     if (0 == dist) nodeIds = undefined;
                     
                     this._nodeTranslationCtrl.translate(nodeIds, transVect, 500, dist, 100).then(() => {
-                        this._viewer.markupManager.unregisterMarkup(this._markupHandle1);
+                        this._viewer.markupManager.unregisterMarkup(this._markupHandle1, this._viewer.view);
                         this._markupHandle1 = undefined;
 
                         this._isBusy = false;
@@ -193,7 +196,7 @@ class CollinearMateOperator {
                 
             if (this._preMarkupHandles.length) {
                 for (let guid of this._preMarkupHandles) {
-                    this._viewer.markupManager.unregisterMarkup(guid);
+                    this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                 }
                 this._preMarkupHandles.length = 0;
             }
@@ -223,13 +226,13 @@ class CollinearMateOperator {
 
         if (this._preMarkupHandles.length) {
             for (let guid of this._preMarkupHandles) {
-                this._viewer.markupManager.unregisterMarkup(guid);
+                this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
             }
             this._preMarkupHandles.length = 0;
         }
 
         if (undefined != this._markupHandle1) {
-            this._viewer.markupManager.unregisterMarkup(this._markupHandle1);
+            this._viewer.markupManager.unregisterMarkup(this._markupHandle1, this._viewer.view);
             this._markupHandle1 = undefined;
         }
 

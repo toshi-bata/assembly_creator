@@ -1,4 +1,5 @@
-class PartDragDropOperator {
+import * as Communicator from "../hoops-web-viewer.mjs";
+export class PartDragDropOperator {
     constructor(viewer, owner) {
         this._viewer = viewer;
         this._owner = owner;

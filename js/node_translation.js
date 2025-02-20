@@ -1,4 +1,5 @@
-class nodeTranslation {
+import * as Communicator from "../hoops-web-viewer.mjs";
+export class nodeTranslation {
     constructor(viewer) {
         this._viewer = viewer;
     }
@@ -113,9 +114,9 @@ class nodeTranslation {
 
             for (var i = 0; i < nodeIds.length; i++) {
                 var nodeLocalAxis = this._convertToLocalVector(nodeIds[i], rotationAxis);
-                nodeRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, stepAngle));
+                nodeRotationMatrixes.push(Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, stepAngle));
                 initMatrixes.push(this._viewer.model.getNodeMatrix(nodeIds[i]));
-                finalRotationMatrixes.push(new Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, angle));
+                finalRotationMatrixes.push(Communicator.Matrix.createFromOffAxisRotation(nodeLocalAxis, angle));
                 localPoints.push(this._convertToLocalPoint(nodeIds[i], basePoint))
             }
 
@@ -160,7 +161,7 @@ class nodeTranslation {
     _convertToLocalVector(nodeId, vector) {
         var parentNode = this._viewer.model.getNodeParent(nodeId);
         var netMatrix = this._viewer.model.getNodeNetMatrix(parentNode);
-        var inverseMatrix = new Communicator.Matrix.inverse(netMatrix);
+        var inverseMatrix = Communicator.Matrix.inverse(netMatrix);
         var localVector0 = Communicator.Point3.zero();
         inverseMatrix.transform(Communicator.Point3.zero(), localVector0);
         var localVector1 = Communicator.Point3.zero();
@@ -176,7 +177,7 @@ class nodeTranslation {
     _convertToLocalPoint(nodeId, point) {
         var parentNode = this._viewer.model.getNodeParent(nodeId);
         var netMatrix = this._viewer.model.getNodeNetMatrix(parentNode);
-        var inverseMatrix = new Communicator.Matrix.inverse(netMatrix);
+        var inverseMatrix = Communicator.Matrix.inverse(netMatrix);
         let localPoint = Communicator.Point3.zero();
         inverseMatrix.transform(point, localPoint);
         return localPoint;

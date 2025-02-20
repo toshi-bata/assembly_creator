@@ -1,4 +1,12 @@
-class Main {
+import * as Communicator from "../hoops-web-viewer.mjs";
+import { createViewer } from "./create_viewer.js";
+import { HandleOperatorOperator } from "./handle_operator_operator.js";
+import { CollinearMateOperator } from "./collinear_mate_operator.js";
+import { ConcentricMateOperator } from "./concentric_mate_operator.js";
+import { CoplanarMateOperator } from "./coplanar_mate_operator.js";
+import { PartDragDropOperator } from "./part_drag_drop_operator.js";
+import { ModelTree } from "./model_tree.js";
+export class Main {
     constructor() {
         this._viewer;
         this._handleOpOp;
@@ -24,7 +32,7 @@ class Main {
     }
 
     createViewer(viewerMode, modelName, reverseProxy) {
-        const scsFileName = "parts/" + modelName + ".scs"
+        const scsFileName = "../parts/" + modelName + ".scs"
         createViewer(viewerMode, scsFileName, "container", reverseProxy).then((hwv) => {
             this._viewer = hwv;
 
@@ -312,7 +320,7 @@ class Main {
 
         $('#instruction').html("Drag a thumbnail from the part list and drop on the viewer");
 
-        $("#container").resize(() => {
+        $(window).resize(() => {
             this.layoutPage();
         });
 

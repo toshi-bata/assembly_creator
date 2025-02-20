@@ -5,7 +5,7 @@ This demo adopts vue.js framework.
 
 ## Dependencies
 ### SDKs in use (version)
-- HOOPS Communicator (2024.1.0)
+- HOOPS Communicator (2025.1.0)
 
 ## Setup
 ### Demo folders
@@ -16,14 +16,15 @@ This demo adopts vue.js framework.
 &emsp;&emsp;+ assembly_cretor.html<br>
 &emsp;&emsp;+ HttpServer.js<br>
 &emsp;&emsp;+ package.json<br>
-&emsp;+ src (copy src folder from `Communicator SDK\web_viewer`)<br>
+&emsp;&emsp;+ demo-app (copy demo-app folder here from Communicator_SDK/web_viewer)<br>
+&emsp;&emsp;+ hoops-web-viewer.mjs (copy hoops-web-viewer.mjs file here from Communicator_SDK/web_viewer)<br>
+&emsp;&emsp;+ engine.esm.wasm (copy engine.esm.wasm file here from Communicator_SDK/web_viewer)<br>
 
 ### Parts
 Part SCS files and PNG images are located in the `parts` folder with `parts_list.json`
 
 ## Start assemly_creator
 1. Launch HTTP server using a command prompt<br>
-    `cd …/cloud_modeler`<br>
     `npm install`<br>
     `npm start`<br>
 2. Open (using Chrome)<br>

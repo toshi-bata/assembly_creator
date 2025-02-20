@@ -1,4 +1,7 @@
-class CoplanarMateOperator {
+import * as Communicator from "../hoops-web-viewer.mjs";
+import { vectorsAngleDeg, CalcNormal } from "./common_utilities.js";
+import { nodeTranslation } from "./node_translation.js";
+export class CoplanarMateOperator {
     constructor(viewer, instructionId, flipBtnId, slideToolbarId, owner) {
         this._viewer = viewer;
         this._instructionId = instructionId;
@@ -163,10 +166,10 @@ class CoplanarMateOperator {
                     let plane = Communicator.Plane.createFromPointAndNormal(this._point1, this._vector1);
                     const lineEnd = this._prePoint.copy().add(this._vector1);
 
-                    Communicator.Util.intersectionPlaneLine2(this._prePoint, lineEnd, plane, inter);
+                    Communicator.intersectionPlaneLine2(this._prePoint, lineEnd, plane, inter);
                     this._centerForFlip = inter;
 
-                    let transVect = new Communicator.Point3.subtract(inter, this._prePoint);
+                    let transVect = Communicator.Point3.subtract(inter, this._prePoint);
                     let dist = transVect.length();
                     transVect.normalize();
 

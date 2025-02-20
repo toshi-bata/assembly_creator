@@ -1,4 +1,6 @@
-class HandleOperatorOperator {
+import * as Communicator from "../hoops-web-viewer.mjs";
+import { ArrowMarkup, MarkerMarkup, rotatePoint } from "./common_utilities.js";
+export class HandleOperatorOperator {
     constructor(viewer, handleOp, handleOpHandle) {
         this._viewer = viewer;
         this._handleOp = handleOp;
@@ -23,7 +25,7 @@ class HandleOperatorOperator {
 
         // Create marker line for pre-select
         this._preMarkupItem = new ArrowMarkup(this._viewer, new Communicator.Color(255, 0, 0));
-        this._preMarkupItem.setStartEndCap(Communicator.Markup.Shape.EndcapType.None, Communicator.Markup.Shape.EndcapType.None);
+        this._preMarkupItem.setStartEndCap(Communicator.Markup.Shapes.EndcapType.None, Communicator.Markup.Shapes.EndcapType.None);
 
         // Create marker circle for pre-select
         this._preMarkupCircleItem = new MarkerMarkup(this._viewer, new Communicator.Color(255, 0, 0));
@@ -44,7 +46,7 @@ class HandleOperatorOperator {
         }
 
         const pickConfig = new Communicator.PickConfig(Communicator.SelectionMask.Face | Communicator.SelectionMask.Line);
-        this._viewer.getView().pickFromPoint(event.getPosition(), pickConfig).then((selectionItem)=> {
+        this._viewer.view.pickFromPoint(event.getPosition(), pickConfig).then((selectionItem)=> {
             if (selectionItem.isFaceSelection()) {
                 // Get selectd node and face IDs
                 const nodeId = selectionItem.getNodeId();
@@ -90,8 +92,8 @@ class HandleOperatorOperator {
                         let planeMin = Communicator.Plane.createFromPointAndNormal(box.min, this._centerAxis);
                         let planeMax = Communicator.Plane.createFromPointAndNormal(box.max, this._centerAxis);
 
-                        Communicator.Util.intersectionPlaneLine2(stPnt, enPnt, planeMin, stPnt);
-                        Communicator.Util.intersectionPlaneLine2(stPnt, enPnt, planeMax, enPnt);
+                        Communicator.intersectionPlaneLine2(stPnt, enPnt, planeMin, stPnt);
+                        Communicator.intersectionPlaneLine2(stPnt, enPnt, planeMax, enPnt);
 
                         this._centerAxis = enPnt.copy().subtract(center);
                         this._centerAxis.normalize();
@@ -109,7 +111,7 @@ class HandleOperatorOperator {
 
                         // Draw markup line at center of pre-select arc / circle face
                         this._preMarkupItem.setPosiiton(stPnt, enPnt);
-                        const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem);
+                        const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem, this._viewer.view);
                         this._preMarkupHandles.push(guid);
 
                         this._preNodeId = nodeId;
@@ -127,7 +129,7 @@ class HandleOperatorOperator {
 
                         // Draw markup line at center of pre-select arc / circle face
                         this._preMarkupCircleItem.setPosiiton(stPnt);
-                        const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupCircleItem);
+                        const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupCircleItem, this._viewer.view);
                         this._preMarkupHandles.push(guid);
 
                         this._preNodeId = nodeId;
@@ -168,7 +170,7 @@ class HandleOperatorOperator {
 
                 // Draw markup line
                 this._preMarkupItem.setPosiiton(stPnt, enPnt);
-                const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem);
+                const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem, this._viewer.view);
                 this._preMarkupHandles.push(guid);
 
                 this._preNodeId = nodeId;
@@ -193,7 +195,7 @@ class HandleOperatorOperator {
         // Remove previous markup line and reset highlight
         if (this._preMarkupHandles.length) {
             for (let guid of this._preMarkupHandles) {
-                this._viewer.markupManager.unregisterMarkup(guid);
+                this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
             }
             this._preMarkupHandles.length = 0;
         }

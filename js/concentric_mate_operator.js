@@ -1,4 +1,7 @@
-class ConcentricMateOperator {
+import * as Communicator from "../hoops-web-viewer.mjs";
+import { ArrowMarkup, rotatePoint, vectorsAngleDeg } from "./common_utilities.js";
+import { nodeTranslation } from "./node_translation.js";
+export class ConcentricMateOperator {
     constructor(viewer, instructionId, flipBtnId, rotateToolbarId, slideToolbarId, owner) {
         this._viewer = viewer;
         this._instructionId = instructionId;
@@ -44,7 +47,7 @@ class ConcentricMateOperator {
         }
         
         const pickConfig = new Communicator.PickConfig(Communicator.SelectionMask.Line + Communicator.SelectionMask.Face);
-        this._viewer.getView().pickFromPoint(event.getPosition(), pickConfig).then((selectionItem)=> {
+        this._viewer.view.pickFromPoint(event.getPosition(), pickConfig).then((selectionItem)=> {
             if (selectionItem.isLineSelection()) {
                 // Get selectd node and line IDs
                 const lineEntity = selectionItem.getLineEntity();
@@ -59,7 +62,7 @@ class ConcentricMateOperator {
                 // Remove previous markup line and reset highlight
                 if (this._preMarkupHandles.length) {
                     for (let guid of this._preMarkupHandles) {
-                        this._viewer.markupManager.unregisterMarkup(guid);
+                        this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                     }
                     this._preMarkupHandles.length = 0;
                 }
@@ -112,7 +115,7 @@ class ConcentricMateOperator {
                     let inc = Communicator.Point3.scale(this._preCenterAxis.copy(), r * 3);
                     const enPnt = this._preCenter.copy().add(inc);
                     this._preMarkupItem.setPosiiton(this._preCenter, enPnt);
-                    const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem);
+                    const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem, this._viewer.view);
                     this._preMarkupHandles.push(guid);
 
                     // Highlight selected line
@@ -133,7 +136,7 @@ class ConcentricMateOperator {
                 // Remove previous markup line and reset highlight
                 if (this._preMarkupHandles.length) {
                     for (let guid of this._preMarkupHandles) {
-                        this._viewer.markupManager.unregisterMarkup(guid);
+                        this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                     }
                     this._preMarkupHandles.length = 0;
                 }
@@ -164,7 +167,7 @@ class ConcentricMateOperator {
                     let inc = Communicator.Point3.scale(this._preCenterAxis.copy(), r * 3);
                     const enPnt = this._preCenter.copy().add(inc);
                     this._preMarkupItem.setPosiiton(this._preCenter, enPnt);
-                    const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem);
+                    const guid  = this._viewer.markupManager.registerMarkup(this._preMarkupItem, this._viewer.view);
                     this._preMarkupHandles.push(guid);
 
                     // Highlight selected line
@@ -178,7 +181,7 @@ class ConcentricMateOperator {
 
                 if (this._preMarkupHandles.length) {
                     for (let guid of this._preMarkupHandles) {
-                        this._viewer.markupManager.unregisterMarkup(guid);
+                        this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                     }
                     this._preMarkupHandles.length = 0;
                 }
@@ -205,7 +208,7 @@ class ConcentricMateOperator {
                 // Switch markup line
                 const pnts = this._preMarkupItem.getPosition();
                 this._markupItem1.setPosiiton(pnts[0], pnts[1]);
-                this._markupHandle1 = this._viewer.markupManager.registerMarkup(this._markupItem1);           
+                this._markupHandle1 = this._viewer.markupManager.registerMarkup(this._markupItem1, this._viewer.view);           
 
                 // Set selected arc color
                 this._viewer.model.setNodeLineColor(this._nodeId1, this._lineId1, new Communicator.Color(255, 255, 0));
@@ -252,7 +255,7 @@ class ConcentricMateOperator {
                         document.getElementById(this._flipBtnId).style.display ="block";
                     }
 
-                    let transVect = new Communicator.Point3.subtract(this._centerPnt1, this._preCenter);
+                    let transVect = Communicator.Point3.subtract(this._centerPnt1, this._preCenter);
                     let dist = transVect.length();
                     transVect.normalize();
 
@@ -268,7 +271,7 @@ class ConcentricMateOperator {
                             document.getElementById(this._slideToolbatId).style.display ="block";
                         }
 
-                        this._viewer.markupManager.unregisterMarkup(this._markupHandle1);
+                        this._viewer.markupManager.unregisterMarkup(this._markupHandle1, this._viewer.view);
                         this._markupHandle1 = undefined;
 
                         this._viewer.model.unsetNodeLineColor(this._nodeId1, this._lineId1);
@@ -307,7 +310,7 @@ class ConcentricMateOperator {
 
             if (this._preMarkupHandles.length) {
                 for (let guid of this._preMarkupHandles) {
-                    this._viewer.markupManager.unregisterMarkup(guid);
+                    this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
                 }
                 this._preMarkupHandles.length = 0;
             }
@@ -367,13 +370,13 @@ class ConcentricMateOperator {
 
         if (this._preMarkupHandles.length) {
             for (let guid of this._preMarkupHandles) {
-                this._viewer.markupManager.unregisterMarkup(guid);
+                this._viewer.markupManager.unregisterMarkup(guid, this._viewer.view);
             }
             this._preMarkupHandles.length = 0;
         }   
 
         if (undefined != this._markupHandle1) {
-            this._viewer.markupManager.unregisterMarkup(this._markupHandle1);
+            this._viewer.markupManager.unregisterMarkup(this._markupHandle1, this._viewer.view);
             this._markupHandle1 = undefined;
         }
 
