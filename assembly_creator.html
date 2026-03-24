@@ -19,12 +19,23 @@
         <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
         
         <!-- jsTree -->
-        <!-- jsTree -->
         <script type="text/javascript" src="jstree/jstree.min.js"></script>
         <link rel="stylesheet" href="jstree/style.min.css">
         
+        <script type="importmap">
+            {
+              "imports": {
+                "@hoops/web-viewer": "../hoops-web-viewer.mjs"
+              }
+            }
+        </script>
         <script type="module">
-            import { Main } from "/js/main.js";
+            import {WebViewer} from "@hoops/web-viewer";
+            WebViewer.defaultEnginePath = "..";
+        </script>
+
+        <script type="module">
+            import { Main } from "/assembly_creator/js/main.js";
             var main;
             window.onload = function () {
                 main = new Main();

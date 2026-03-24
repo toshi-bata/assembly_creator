@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 export class ModelTree {
     constructor(viewer, treeDiv, owner) {
         this._viewer = viewer;

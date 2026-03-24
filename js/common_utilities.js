@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 // compute angle and rotation axis between two vectors
 export function vectorsAngleDeg(point3d1, point3d2) {
     if (point3d1.equalsWithTolerance(point3d2, 1.0E-8)) {

@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 import { ArrowMarkup, MarkerMarkup, rotatePoint, vectorsAngleDeg } from "./common_utilities.js";
 export class HandleOperatorOperator {
     constructor(viewer, handleOp, handleOpHandle) {

@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 import { ArrowMarkup, rotatePoint, vectorsAngleDeg } from "./common_utilities.js";
 import { nodeTranslation } from "./node_translation.js";
 export class ConcentricMateOperator {

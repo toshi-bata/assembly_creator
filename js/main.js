@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 import { createViewer } from "./create_viewer.js";
 import { HandleOperatorOperator } from "./handle_operator_operator.js";
 import { CollinearMateOperator } from "./collinear_mate_operator.js";
@@ -32,7 +32,7 @@ export class Main {
     }
 
     createViewer(viewerMode, modelName, reverseProxy) {
-        const scsFileName = "../parts/" + modelName + ".scs"
+        const scsFileName = "/assembly_creator/parts/" + modelName + ".scs"
         createViewer(viewerMode, scsFileName, "container", reverseProxy).then((hwv) => {
             this._viewer = hwv;
 
@@ -154,13 +154,13 @@ export class Main {
         });
 
         // Create parts list
-        const url = "parts/parts_list.json";
+        const url = "/assembly_creator/parts/parts_list.json";
         $.getJSON(url, (data) => {
             if (data.parts) {
                 const partsList = data.parts;
                 for (let part of partsList) {
                     const image = new Image();
-                    image.src = "parts/" + part.name + ".png";
+                    image.src = "/assembly_creator/parts/" + part.name + ".png";
 
                     let $ele = $('<div />', {class:'partsList_thumbnail',title:part.name,'data-model':part.name});
                     // $($ele[0]).data('model', part.name);
@@ -474,7 +474,7 @@ export class Main {
             }
             else if ('addPart' == targetHistory.type) {
                 const partName = targetHistory.partName;
-                const scsFileName = "parts/" + partName + ".scs";
+                const scsFileName = "/assembly_creator/parts/" + partName + ".scs";
                 const matrix = targetHistory.matrix;
 
                 // Load the part
@@ -578,7 +578,7 @@ export class Main {
         const parts = assembly.parts;
         for (let part of parts) {
             // Lode model
-            const scsFileName = "parts/" + part.name + ".scs";
+            const scsFileName = "/assembly_creator/parts/" + part.name + ".scs";
             let config = new Communicator.LoadSubtreeConfig();
             if (false == part.visibility) config.attachInvisibly = true;
             const nodeIds = await this._viewer.model.loadSubtreeFromScsFile(root, scsFileName, config);

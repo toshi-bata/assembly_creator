@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 export class nodeTranslation {
     constructor(viewer) {
         this._viewer = viewer;

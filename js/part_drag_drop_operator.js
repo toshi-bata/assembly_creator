@@ -1,4 +1,4 @@
-import * as Communicator from "../hoops-web-viewer.mjs";
+import * as Communicator from "@hoops/web-viewer";
 export class PartDragDropOperator {
     constructor(viewer, owner) {
         this._viewer = viewer;
@@ -15,7 +15,7 @@ export class PartDragDropOperator {
 
         this._partName = partName;
 
-        const scsFileName = "parts/" + this._partName + ".scs";
+        const scsFileName = "/assembly_creator/parts/" + this._partName + ".scs";
 
         this._viewer.model.getModelBounding(true).then((bbox) => {
             // Set anchor as current bounding box
