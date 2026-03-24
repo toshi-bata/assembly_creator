@@ -1,23 +1,27 @@
-# HOOPS Communicator Assmbly Creator
-This demo introduces an unique workflow using HOOPS Communicator that loads parts from a parts list and constructs an assembly model using custom mate operators such as collinear, concentric and coplanar. This workflow can be utilized in various industries such as maintenance manual, work instruction or e-commerce (custom order), etc.<br>  
-The created assembly structure can be represented in a  JSON string and reproduced.
+# HOOPS Visualize Web Assmbly Creator
+This demo introduces a unique workflow using HOOPS Visualize Web that loads parts from a parts list and constructs an assembly model using custom mate operators such as collinear, concentric and coplanar. This workflow can be utilized across various industries including maintenance manuals, work instructions and e-commerce (custom orders).<br>  
+The created assembly structure can be represented as a JSON string and reproduced.
 
 ## Dependencies
 ### SDKs in use (version)
-- HOOPS Communicator (2025.1.0)
+- HOOPS Visualize Web (2026.2.0)
 
 ## Setup
 ### Demo folders
-&emsp;+ assembly_creator<br>
-&emsp;&emsp;+ css<br>
-&emsp;&emsp;+ js<br>
-&emsp;&emsp;+ parts<br>
-&emsp;&emsp;+ assembly_cretor.html<br>
-&emsp;&emsp;+ HttpServer.js<br>
-&emsp;&emsp;+ package.json<br>
-&emsp;&emsp;+ demo-app (copy demo-app folder here from Communicator_SDK/web_viewer)<br>
-&emsp;&emsp;+ hoops-web-viewer.mjs (copy hoops-web-viewer.mjs file here from Communicator_SDK/web_viewer)<br>
-&emsp;&emsp;+ engine.esm.wasm (copy engine.esm.wasm file here from Communicator_SDK/web_viewer)<br>
+```
+root
+├── assembly_creator/
+│   ├── css/
+│   ├── js/
+│   ├── jstree/
+│   ├── parts/
+│   ├── assembly_cretor.html
+│   ├── HttpServer.js
+│   └── package.json
+├── demo-app/               # copy from HVW SDK/web_viewer
+├── hoops-web-viewer.mjs    # copy from HVW SDK/web_viewer
+└── engine.esm.wasm         # copy from Visualize Web SDK/web_viewer
+```
 
 ### Parts
 Part SCS files and PNG images are located in the `parts` folder with `parts_list.json`
@@ -26,5 +30,5 @@ Part SCS files and PNG images are located in the `parts` folder with `parts_list
 1. Launch HTTP server using a command prompt<br>
     `npm install`<br>
     `npm start`<br>
-2. Open (using Chrome)<br>
+2. Open in Chrome<br>
 &emsp;http://localhost:8000/assembly_creator.html?viewer=SCS&instance=housing
